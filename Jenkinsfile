@@ -15,7 +15,7 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/Aj7Ay/Netflix-clone.git'
+                git branch: 'main', url: 'https://github.com/Sahil2k24/Netflix-Clone-Project.git'
             }
         }
         stage("Sonarqube Analysis "){
