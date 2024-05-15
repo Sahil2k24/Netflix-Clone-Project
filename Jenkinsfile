@@ -13,12 +13,12 @@ pipeline{
                 cleanWs()
             }
         }
-        stage('Checkout from Git'){
+        stage('CHECKOUT FROM GIT'){
             steps{
                 git branch: 'main', url: 'https://github.com/Sahil2k24/Netflix-Clone-Project.git'
             }
         }
-        stage("Sonarqube Analysis "){
+        stage("SONARQUBE ANALYSIS "){
             steps{
                 withSonarQubeEnv('sonar-server') {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
@@ -26,14 +26,14 @@ pipeline{
                 }
             }
         }
-        stage("quality gate"){
+        stage("QUALITY GATES"){
            steps {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
                 }
             } 
         }
-        stage('Install Dependencies') {
+        stage('INSTALL DEPENEDENCIES') {
             steps {
                 sh "npm install"
             }
@@ -49,7 +49,7 @@ pipeline{
                 sh "trivy fs . > trivyfs.txt"
             }
         }
-        stage("Docker Build & Push"){
+        stage("DOCKER BUILD & PUSH"){
             steps{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
@@ -59,30 +59,17 @@ pipeline{
                     }
                 }
             }
-        }
+        } 
         stage("TRIVY"){
             steps{
                 sh "trivy image nasi101/netflix:latest > trivyimage.txt" 
             }
         }
-        stage('Deploy to container'){
+        stage('DEPLOY TO CONTAINER'){
             steps{
                 sh 'docker run -d -p 8081:80 sahil2k24/netflix:latest'
             }
         }
-        stage('Deploy to kubernets'){
-            steps{
-                script{
-                    dir('Kubernetes') {
-                        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                                sh 'kubectl apply -f deployment.yml'
-                                sh 'kubectl apply -f service.yml'
-                        }   
-                    }
-                }
-            }
-        }
-
     }
     post {
      always {
@@ -91,7 +78,7 @@ pipeline{
             body: "Project: ${env.JOB_NAME}<br/>" +
                 "Build Number: ${env.BUILD_NUMBER}<br/>" +
                 "URL: ${env.BUILD_URL}<br/>",
-            to: 'iambatmanthegoat@gmail.com',
+            to: 'sahilpatil2k24@gmail.com',
             attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
         }
     }
